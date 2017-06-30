@@ -1,29 +1,49 @@
-import os
-import re
 import argparse
+from search import file_name_search, text_pattern_search, complete_search
 
 
 def get_arguments():
 
-    parser = argparse.ArgumentParser(description="Recursively traverse the \
-        directory for finding a given regex pattern in files")
-    parser.add_argument("dir_path", metavar="directory")
-    parser.add_argument("--o", help="output file")
-    # parser.add_argument("r_pattern", metavar="regex_pattern")
+    parser = argparse.ArgumentParser(
+        description="Recursively traverse the directory for finding \
+            a given regex pattern in files")
+    parser.add_argument(
+        'dir_path',
+        help='directory'
+        )
+    parser.add_argument(
+        'regex_pattern',
+        help='regex_pattern'
+        )
+
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument(
+        '-f',
+        '--file_name',
+        dest='accumulate',
+        action='store_const',
+        const=file_name_search,
+        default=complete_search,
+        help='search only text pattern in the files of directory'
+        )
+    parser.add_argument(
+        '-t'
+        '--file_text',
+        dest='accumulate',
+        action='store_const',
+        const=text_pattern_search,
+        default=complete_search,
+        help='search only name of files in the directory'
+        )
+
+    parser.add_argument(
+        '-o',
+        '--output',
+        default=None,
+        type=str,
+        help='specify custom output file output file')
+
     return parser.parse_args()
-
-
-def traverse(dir_path, file_name):
-    with open(os.path.join(".", file_name), 'a+') as output:
-        for dir_path, dirs, files in os.walk(dir_path):
-            for filename in files:
-                with open(os.path.join(dir_path, filename), 'r') as src:
-                    matches = re.findall(r'(?:(?:\+|0{0,2})91(\s*[\-]\s*) \
-                            ?|[0]?)?([789]\d{9})', src.read(), re.DOTALL)
-                    if (len(matches) != 0):
-                        for match in matches:
-                            if len(match) != 0:
-                                output.write(match[1] + '\n')
 
 
 def main():
@@ -35,10 +55,12 @@ def main():
         print("Traverson: error: no such file or directory: '{}'"
               .format(arguments.dir_path))
 
-    file_name = arguments.o if arguments.o else "output_file.txt"
-    print(dir_path)
-    print(file_name)
-    traverse(dir_path, file_name)
+    try:
+        regex_pattern = arguments.regex_pattern
+    except IOError:
+        print("Traverson: error: Enter a valid regex pettern")
+
+    arguments.accumulate(dir_path, regex_pattern, arguments.output)
 
 
 if __name__ == "__main__":
