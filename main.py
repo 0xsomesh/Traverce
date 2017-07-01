@@ -1,5 +1,5 @@
 import argparse
-from search import file_name_search, text_pattern_search, complete_search
+from search import file_name_search
 
 
 def get_arguments():
@@ -16,25 +16,25 @@ def get_arguments():
         help='regex_pattern'
         )
 
-    group = parser.add_mutually_exclusive_group()
-    group.add_argument(
-        '-f',
-        '--file_name',
-        dest='accumulate',
-        action='store_const',
-        const=file_name_search,
-        default=complete_search,
-        help='search only text pattern in the files of directory'
-        )
-    parser.add_argument(
-        '-t'
-        '--file_text',
-        dest='accumulate',
-        action='store_const',
-        const=text_pattern_search,
-        default=complete_search,
-        help='search only name of files in the directory'
-        )
+    # group = parser.add_mutually_exclusive_group()
+    # parser.add_argument(
+    #     '-f',
+    #     '--file_name',
+    #     dest='accumulate',
+    #     action='store_const',
+    #     const=file_name_search,
+    #     default=complete_search,
+    #     help='search only text pattern in the files of directory'
+    #     )
+    # parser.add_argument(
+    #     '-t'
+    #     '--file_text',
+    #     dest='accumulate',
+    #     action='store_const',
+    #     const=text_pattern_search,
+    #     default=complete_search,
+    #     help='search only name of files in the directory'
+    #     )
 
     parser.add_argument(
         '-o',
@@ -60,7 +60,7 @@ def main():
     except IOError:
         print("Traverson: error: Enter a valid regex pettern")
 
-    arguments.accumulate(dir_path, regex_pattern, arguments.output)
+    file_name_search(dir_path, regex_pattern, arguments.output)
 
 
 if __name__ == "__main__":
